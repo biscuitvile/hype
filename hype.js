@@ -3,7 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 
-function processFile(filePath, yeahPercent = 0) {
+function processFile(filePath, yeahPercent = 0, micPercent = 0) {
   try {
     const content = fs.readFileSync(filePath, "utf8");
 
@@ -18,6 +18,10 @@ function processFile(filePath, yeahPercent = 0) {
     };
 
     //🎵"PROCESS DIFFERENT COMMENT STYLES!"🎵
+    const getEmoji = () => {
+      if (micPercent >= 100) return "🎤";
+      return Math.random() * 100 < micPercent ? "🎤" : "🎵";
+    };
     let processed = content
       //🎵"SINGLE LINE COMMENTS: SLASH SLASH COMMENT TO HYPED FORMAT!"🎵
       .replace(
@@ -25,7 +29,8 @@ function processFile(filePath, yeahPercent = 0) {
         (match, p1) => {
           const text = p1.trim().toUpperCase().replace(/\.$/, '');
           const finalText = addYeah(`"${text}!"`);
-          return `//🎵${finalText}🎵`;
+          const emoji = getEmoji();
+          return `//${emoji}${finalText}${emoji}`;
         }
       )
       //🎵"MULTI-LINE C-STYLE COMMENTS: SLASH STAR TO HYPED FORMAT!"🎵
@@ -34,14 +39,16 @@ function processFile(filePath, yeahPercent = 0) {
         (match, p1) => {
           const text = p1.trim().toUpperCase().replace(/\.$/, '');
           const finalText = addYeah(`"${text}!"`);
-          return `/*🎵${finalText}🎵*/`;
+          const emoji = getEmoji();
+          return `/*${emoji}${finalText}${emoji}*/`;
         }
       )
       //🎵"PYTHON SHELL RUBY COMMENTS: HASH TO HYPED FORMAT!"🎵
       .replace(/#\s*(.*)/g, (match, p1) => {
         const text = p1.trim().toUpperCase().replace(/\.$/, '');
         const finalText = addYeah(`"${text}!"`);
-        return `#🎵${finalText}🎵`;
+        const emoji = getEmoji();
+        return `#${emoji}${finalText}${emoji}`;
       })
       //🎵"RUBY MULTI-LINE COMMENTS: EQUALS BEGIN TO HYPED FORMAT!"🎵
       .replace(
@@ -49,7 +56,8 @@ function processFile(filePath, yeahPercent = 0) {
         (match, p1) => {
           const text = p1.trim().toUpperCase().replace(/\.$/, '');
           const finalText = addYeah(`"${text}!"`);
-          return `=begin\n🎵${finalText}🎵\n=end`;
+          const emoji = getEmoji();
+          return `=begin\n${emoji}${finalText}${emoji}\n=end`;
         }
       )
       //🎵"HTML COMMENTS: ANGLE BRACKET TO HYPED FORMAT!"🎵
@@ -58,7 +66,8 @@ function processFile(filePath, yeahPercent = 0) {
         (match, p1) => {
           const text = p1.trim().toUpperCase().replace(/\.$/, '');
           const finalText = addYeah(`"${text}!"`);
-          return `<!--🎵${finalText}🎵-->`;
+          const emoji = getEmoji();
+          return `<!--${emoji}${finalText}${emoji}-->`;
         }
       );
 
@@ -69,7 +78,7 @@ function processFile(filePath, yeahPercent = 0) {
   }
 }
 
-function processDirectory(dirPath, extensions = [], yeahPercent = 0) {
+function processDirectory(dirPath, extensions = [], yeahPercent = 0, micPercent = 0) {
   try {
     const items = fs.readdirSync(dirPath);
 
@@ -82,12 +91,12 @@ function processDirectory(dirPath, extensions = [], yeahPercent = 0) {
         if (
           !["node_modules", ".git", ".vscode", "dist", "build"].includes(item)
         ) {
-          processDirectory(fullPath, extensions, yeahPercent);
+          processDirectory(fullPath, extensions, yeahPercent, micPercent);
         }
       } else if (stat.isFile()) {
         const ext = path.extname(fullPath).toLowerCase();
         if (extensions.length === 0 || extensions.includes(ext)) {
-          processFile(fullPath, yeahPercent);
+          processFile(fullPath, yeahPercent, micPercent);
         }
       }
     }
@@ -105,6 +114,7 @@ Usage:
   node hype.js <directory>               Process all files in directory
   node hype.js <directory> --ext .js     Process only specific extensions
   node hype.js <file> --yeah 25          Add "Yeah!" or "Oh yeah!" 25% of the time
+  node hype.js <file> --mic 50           Use microphone 🎤 50% of the time (100 = always)
   node hype.js --help                    Show this help
 
 Examples:
@@ -112,6 +122,7 @@ Examples:
   node hype.js ./src
   node hype.js ./src --ext .js,.ts,.py
   node hype.js ./src --yeah 50
+  node hype.js script.js --mic 100
 
 Supported comment formats:
   // Single line comments (JS, C, C++, Java, etc.)
@@ -133,8 +144,10 @@ if (args.length === 0 || args.includes("--help")) {
 const target = args[0];
 const extIndex = args.indexOf("--ext");
 const yeahIndex = args.indexOf("--yeah");
+const micIndex = args.indexOf("--mic");
 let extensions = [];
 let yeahPercent = 0;
+let micPercent = 0;
 
 if (extIndex !== -1 && args[extIndex + 1]) {
   extensions = args[extIndex + 1].split(",").map((ext) => ext.trim());
@@ -148,6 +161,14 @@ if (yeahIndex !== -1 && args[yeahIndex + 1]) {
   }
 }
 
+if (micIndex !== -1 && args[micIndex + 1]) {
+  micPercent = parseInt(args[micIndex + 1], 10);
+  if (isNaN(micPercent) || micPercent < 0 || micPercent > 100) {
+    console.error(`❌ Mic percent must be a number between 0 and 100`);
+    process.exit(1);
+  }
+}
+
 if (!fs.existsSync(target)) {
   console.error(`❌ Path does not exist: ${target}`);
   process.exit(1);
@@ -156,10 +177,10 @@ if (!fs.existsSync(target)) {
 const stat = fs.statSync(target);
 
 if (stat.isFile()) {
-  processFile(target, yeahPercent);
+  processFile(target, yeahPercent, micPercent);
 } else if (stat.isDirectory()) {
   console.log(`🎵 Getting hyped in: ${target}`);
-  processDirectory(target, extensions, yeahPercent);
+  processDirectory(target, extensions, yeahPercent, micPercent);
 } else {
   console.error(`❌ Invalid target: ${target}`);
   process.exit(1);

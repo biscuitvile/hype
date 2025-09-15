@@ -9,6 +9,7 @@ node hype.js <file>                    # Process a single file
 node hype.js <directory>               # Process all files in directory
 node hype.js <directory> --ext .js,.py # Process only specific extensions
 node hype.js <file> --yeah 25          # Add "Yeah!" or "Oh yeah!" 25% of the time
+node hype.js <file> --mic 50           # Use microphone 🎤 50% of the time (100 = always)
 node hype.js --help                    # Show help
 ```
 
