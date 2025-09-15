@@ -7,7 +7,7 @@ function processFile(filePath, yeahPercent = 0) {
   try {
     const content = fs.readFileSync(filePath, "utf8");
 
-    // Helper function to add random yeah
+    //🎵"HELPER FUNCTION TO ADD RANDOM YEAH!"🎵
     const addYeah = (text) => {
       if (Math.random() * 100 < yeahPercent) {
         const yeahs = ["Yeah!", "Oh yeah!"];
@@ -17,9 +17,9 @@ function processFile(filePath, yeahPercent = 0) {
       return text;
     };
 
-    // Process different comment styles
+    //🎵"PROCESS DIFFERENT COMMENT STYLES!"🎵
     let processed = content
-      // Single line comments: // comment -> //🎵"COMMENT!"🎵
+      //🎵"SINGLE LINE COMMENTS: SLASH SLASH COMMENT TO HYPED FORMAT!"🎵
       .replace(
         /\/\/\s*(.*)/g,
         (match, p1) => {
@@ -28,7 +28,7 @@ function processFile(filePath, yeahPercent = 0) {
           return `//🎵${finalText}🎵`;
         }
       )
-      // Multi-line C-style comments: /* comment */ -> /*🎵"COMMENT!"🎵*/
+      //🎵"MULTI-LINE C-STYLE COMMENTS: SLASH STAR TO HYPED FORMAT!"🎵
       .replace(
         /\/\*\s*([\s\S]*?)\s*\*\//g,
         (match, p1) => {
@@ -37,13 +37,13 @@ function processFile(filePath, yeahPercent = 0) {
           return `/*🎵${finalText}🎵*/`;
         }
       )
-      // Python/Shell/Ruby comments: # comment -> #🎵"COMMENT!"🎵
+      //🎵"PYTHON SHELL RUBY COMMENTS: HASH TO HYPED FORMAT!"🎵
       .replace(/#\s*(.*)/g, (match, p1) => {
         const text = p1.trim().toUpperCase().replace(/\.$/, '');
         const finalText = addYeah(`"${text}!"`);
         return `#🎵${finalText}🎵`;
       })
-      // Ruby multi-line comments: =begin...=end -> =begin🎵"COMMENT!"🎵=end
+      //🎵"RUBY MULTI-LINE COMMENTS: EQUALS BEGIN TO HYPED FORMAT!"🎵
       .replace(
         /=begin\s*([\s\S]*?)\s*=end/g,
         (match, p1) => {
@@ -52,7 +52,7 @@ function processFile(filePath, yeahPercent = 0) {
           return `=begin\n🎵${finalText}🎵\n=end`;
         }
       )
-      // HTML comments: <!-- comment --> -> <!--🎵"COMMENT!"🎵-->
+      //🎵"HTML COMMENTS: ANGLE BRACKET TO HYPED FORMAT!"🎵
       .replace(
         /<!--\s*([\s\S]*?)\s*-->/g,
         (match, p1) => {
@@ -78,7 +78,7 @@ function processDirectory(dirPath, extensions = [], yeahPercent = 0) {
       const stat = fs.statSync(fullPath);
 
       if (stat.isDirectory()) {
-        // Skip node_modules, .git, and other common directories
+        //🎵"SKIP NODE MODULES GIT AND OTHER COMMON DIRECTORIES!"🎵
         if (
           !["node_modules", ".git", ".vscode", "dist", "build"].includes(item)
         ) {
@@ -122,7 +122,7 @@ Supported comment formats:
 `);
 }
 
-// Parse command line arguments
+//🎵"PARSE COMMAND LINE ARGUMENTS!"🎵
 const args = process.argv.slice(2);
 
 if (args.length === 0 || args.includes("--help")) {
